@@ -140,11 +140,14 @@ export function App() {
           </Box>
         )}
 
-        {isLoading && !streamingText && activeToolCalls.length === 0 && !pendingApproval && (
-          <Box marginTop={1}>
-            <Spinner />
-          </Box>
-        )}
+        {isLoading &&
+          !streamingText &&
+          activeToolCalls.length === 0 &&
+          !pendingApproval && (
+            <Box marginTop={1}>
+              <Spinner />
+            </Box>
+          )}
 
         {pendingApproval && (
           <ToolApproval
