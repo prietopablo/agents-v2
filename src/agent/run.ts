@@ -8,8 +8,8 @@ const MODEL = mistral(MODEL_NAME);
 
 export const runAgent = async (
   userMessage: string,
-  conversation: ModelMessage[],
-  agentCallbacks: AgentCallbacks,
+  conversation?: ModelMessage[],
+  agentCallbacks?: AgentCallbacks,
 ) => {
   const { text } = await generateText({
     model: MODEL,
