@@ -1,8 +1,11 @@
 import "dotenv/config";
-import { generateText, type ModelMessage } from "ai";
 import { mistral } from "@ai-sdk/mistral";
-import { SYSTEM_PROMPT } from "./system/prompt";
+import { generateText, type ModelMessage } from "ai";
 import type { AgentCallbacks } from "../types";
+import { executeTools } from "./executeTools.ts";
+import { SYSTEM_PROMPT } from "./system/prompt";
+import { tools } from "./tools/index.ts";
+
 const MODEL_NAME = "mistral-small-latest";
 const MODEL = mistral(MODEL_NAME);
 
@@ -11,13 +14,20 @@ export const runAgent = async (
   conversation?: ModelMessage[],
   agentCallbacks?: AgentCallbacks,
 ) => {
-  const { text } = await generateText({
+  const { text, toolCalls } = await generateText({
     model: MODEL,
     prompt: userMessage,
     system: SYSTEM_PROMPT,
+    tools,
+    toolChoice: "auto",
   });
 
-  console.log(text);
+  console.log(text, toolCalls);
+
+  toolCalls?.forEach(async (toolCall) => {
+    const result = await executeTools(toolCall.toolName, toolCall.input);
+    console.log(result);
+  });
 };
 
-runAgent("Hello, how are you?");
+runAgent("What is the current date and time?");
