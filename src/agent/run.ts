@@ -16,9 +16,9 @@ Laminar.initialize({
 
 export const runAgent = async (
   userMessage: string,
-  conversation?: ModelMessage[],
+  conversation: ModelMessage[] = [],
   agentCallbacks?: AgentCallbacks,
-) => {
+): Promise<ModelMessage[]> => {
   const { text, toolCalls } = await generateText({
     model: MODEL,
     prompt: userMessage,
@@ -37,6 +37,14 @@ export const runAgent = async (
     const result = await executeTools(toolCall.toolName, toolCall.input);
     console.log(result);
   });
+
+  agentCallbacks?.onComplete(text);
+
+  return [
+    ...conversation,
+    { role: "user", content: userMessage },
+    { role: "assistant", content: text },
+  ];
 };
 
 runAgent("What is the current date and time?");
