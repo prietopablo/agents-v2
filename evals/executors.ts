@@ -1,5 +1,5 @@
 import { mistral } from "@ai-sdk/mistral";
-import { generateText, stepCountIs, type ToolSet } from "ai";
+import { generateText, stepCountIs, type ToolSet, tool } from "ai";
 import { z } from "zod";
 import type {
   EvalData,
@@ -7,6 +7,7 @@ import type {
   MultiTurnResult,
   SingleTurnResult,
 } from "./types.ts";
+import { buildMessages } from "./utils.ts";
 
 const TOOL_DEFINITIONS = {
   readFile: {
@@ -42,4 +43,25 @@ const TOOL_DEFINITIONS = {
       command: z.string().describe("The shell command to run"),
     }),
   },
+};
+
+export const singleTurnExecutor = async (data: EvalData) => {
+  const messages = buildMessages(data);
+
+  const tools: ToolSet = {};
+  for (const toolName of data.tools) {
+    const def = TOOL_DEFINITIONS[toolName];
+    if (def) {
+      tools[toolName] = tool({
+        description: def.description,
+        inputSchema: def.inputSchema,
+      });
+    }
+  }
+
+  const { toolCalls } = await generateText({
+    model: mistral(data.config?.model ?? "mistral-small-latest"),
+    messages,
+    tools,
+  });
 };
