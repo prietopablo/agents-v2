@@ -2,9 +2,9 @@ import "dotenv/config";
 import { mistral } from "@ai-sdk/mistral";
 import { aiSdkTelemetry, Laminar } from "@lmnr-ai/lmnr";
 import { generateText, type ModelMessage } from "ai";
-import type { AgentCallbacks } from "../types";
+import type { AgentCallbacks } from "../types.ts";
 import { executeTools } from "./executeTools.ts";
-import { SYSTEM_PROMPT } from "./system/prompt";
+import { SYSTEM_PROMPT } from "./system/prompt.ts";
 import { tools } from "./tools/index.ts";
 
 const MODEL_NAME = "mistral-small-latest";
@@ -46,5 +46,3 @@ export const runAgent = async (
     { role: "assistant", content: text },
   ];
 };
-
-runAgent("What is the current date and time?");
