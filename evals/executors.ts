@@ -9,7 +9,12 @@ import type {
 } from "./types.ts";
 import { buildMessages } from "./utils.ts";
 
-const TOOL_DEFINITIONS = {
+type ToolDefinition = {
+  description: string;
+  inputSchema: z.ZodObject<any>;
+};
+
+const TOOL_DEFINITIONS: Record<string, ToolDefinition> = {
   readFile: {
     description: "Read the contents of a file at a specified path",
     inputSchema: z.object({
@@ -63,5 +68,13 @@ export const singleTurnExecutor = async (data: EvalData) => {
     model: mistral(data.config?.model ?? "mistral-small-latest"),
     messages,
     tools,
+    stopWhen: stepCountIs(1),
+    temperature: data.config?.temperature ?? undefined,
   });
+
+  const calls = toolCalls.map( toolCall => {
+    return {toolName: toolCall.toolName, args: "args" in toolCall ? toolCall?.args : {}}
+  });
+
+  return {calls, selectedAny: calls.length > 0}
 };
