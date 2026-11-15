@@ -50,7 +50,7 @@ const TOOL_DEFINITIONS: Record<string, ToolDefinition> = {
   },
 };
 
-export const singleTurnExecutor = async (data: EvalData) => {
+export const singleTurnExecutorWithMocks = async (data: EvalData) => {
   const messages = buildMessages(data);
 
   const tools: ToolSet = {};
@@ -64,7 +64,7 @@ export const singleTurnExecutor = async (data: EvalData) => {
     }
   }
 
-  const { toolCalls } = await generateText({
+  const result = await generateText({
     model: mistral(data.config?.model ?? "mistral-small-latest"),
     messages,
     tools,
@@ -72,9 +72,16 @@ export const singleTurnExecutor = async (data: EvalData) => {
     temperature: data.config?.temperature ?? undefined,
   });
 
-  const calls = toolCalls.map( toolCall => {
-    return {toolName: toolCall.toolName, args: "args" in toolCall ? toolCall?.args : {}}
+  const toolCalls = result.toolCalls.map((toolCall) => {
+    return {
+      toolName: toolCall.toolName,
+      args: "args" in toolCall ? toolCall?.args : {},
+    };
   });
 
-  return {calls, selectedAny: calls.length > 0}
+  const toolNames = toolCalls.map((toolCall) => {
+    return toolCall.toolName;
+  });
+
+  return { toolCalls, toolNames, selectedAny: toolCalls.length > 0 };
 };
