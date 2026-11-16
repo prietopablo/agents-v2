@@ -1,4 +1,4 @@
-import { type ModelMessage, type ToolSet, tool } from "ai";
+import { type ModelMessage, type ToolSet, type UserContent, tool } from "ai";
 import { z } from "zod";
 import { SYSTEM_PROMPT } from "../src/agent/system/prompt.ts";
 import type { EvalData, MultiTurnEvalData } from "./types.ts";
@@ -37,7 +37,7 @@ export const buildMessages = (
   data: EvalData | { prompt?: string; systemPrompt?: string },
 ): ModelMessage[] => {
   // Remove system message from array - it will be passed via instructions parameter
-  return [{ role: "user", content: data.prompt! }];
+  return [{ role: "user", content: data.prompt as UserContent }];
 };
 
 /**
