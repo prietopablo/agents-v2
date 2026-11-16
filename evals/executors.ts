@@ -7,7 +7,7 @@ import type {
   MultiTurnResult,
   SingleTurnResult,
 } from "./types.ts";
-import { buildMessages } from "./utils.ts";
+import { buildMessages, getSystemPrompt } from "./utils.ts";
 
 type ToolDefinition = {
   description: string;
@@ -64,9 +64,12 @@ export const singleTurnExecutorWithMocks = async (data: EvalData) => {
     }
   }
 
+  const systemPrompt = getSystemPrompt(data);
+
   const result = await generateText({
     model: mistral(data.config?.model ?? "mistral-small-latest"),
     messages,
+    instructions: systemPrompt,
     tools,
     stopWhen: stepCountIs(1),
     temperature: data.config?.temperature ?? undefined,

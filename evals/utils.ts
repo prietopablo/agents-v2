@@ -31,13 +31,20 @@ export const buildMockedTools = (
 
 /**
  * Build message array from eval data
+ * Returns only user message for generateText, system prompt should be passed via instructions
  */
 export const buildMessages = (
   data: EvalData | { prompt?: string; systemPrompt?: string },
 ): ModelMessage[] => {
-  const systemPrompt = data.systemPrompt ?? SYSTEM_PROMPT;
-  return [
-    { role: "system", content: systemPrompt },
-    { role: "user", content: data.prompt! },
-  ];
+  // Remove system message from array - it will be passed via instructions parameter
+  return [{ role: "user", content: data.prompt! }];
+};
+
+/**
+ * Get system prompt from eval data
+ */
+export const getSystemPrompt = (
+  data: EvalData | { prompt?: string; systemPrompt?: string },
+): string => {
+  return data.systemPrompt ?? SYSTEM_PROMPT;
 };
